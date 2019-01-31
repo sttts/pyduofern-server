@@ -1,0 +1,4 @@
+pyduofern
+pyserial
+pyserial-asyncio
+Flask
