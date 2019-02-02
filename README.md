@@ -22,7 +22,7 @@ It serves the following API endpoints:
 Before using the devices with the server, they must be paired. Choose a four-digit-code (see above) and then start the container in pairing mode:
 
 ```bash
-$ docker run -it --rm --name pyduofern-server --privileged -p 8080:8080 docker.io/sttts/pyduofern-server:latest --code <four-digit-code> --device /dev/ttyUSB0 --pair --pair-time 120
+$ docker run -it --rm --name pyduofern-server --privileged docker.io/sttts/pyduofern-server:latest --code <four-digit-code> --device /dev/ttyUSB0 --pair --pair-time 120
 ```
 
 After the pairing time, it will terminate.
