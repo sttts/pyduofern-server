@@ -1,5 +1,4 @@
-FROM python:3.6
-
+FROM __BASEIMAGE_ARCH__/python:3.6-alpine3.8
 WORKDIR /pyduofern-server
 
 COPY requirements.txt .
