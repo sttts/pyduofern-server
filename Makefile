@@ -33,7 +33,7 @@ push: experimental-docker-cli
 		for arch in $(ARCHS); do \
 			docker push $(REPO):$${arch}-latest; \
 		done
-		docker manifest create -a $(REPO):latest $(REPO):amd64-latest $(REPO):arm32v6-latest $(REPO):arm64v8-latest
+		docker manifest create $(REPO):latest $(REPO):amd64-latest $(REPO):arm32v6-latest $(REPO):arm64v8-latest
 		docker manifest annotate $(REPO):latest $(REPO):arm32v6-latest --os linux --arch arm
 		docker manifest annotate $(REPO):latest $(REPO):arm64v8-latest --os linux --arch arm64 --variant armv8
-		docker manifest push $(REPO):latest
+		docker manifest push --purge $(REPO):latest

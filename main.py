@@ -35,4 +35,4 @@ if __name__ == '__main__':
     stick._initialize()
     stick.start()
 
-    app.run(debug=args.debug is True, host=args.host, port=args.port)
+    app.run(debug=args.debug is True, host=args.listen, port=args.port)
