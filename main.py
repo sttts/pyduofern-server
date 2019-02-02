@@ -1,26 +1,47 @@
 import argparse
+import logging
+import os
 import sys
 
-from pyduofern.duofern_stick import DuofernStickThreaded
+import time
+
+import tempfile
+from pyduofern.duofern_stick import DuofernStickThreaded, duoACK, duoSetPairs
 from flask import Flask
+from pyduofern.exceptions import DuofernTimeoutException
 
 app = Flask(__name__)
+logger = logging.getLogger(__file__)
 
+def setPair(device):
+    hex_to_write = duoSetPairs.replace('nn', '{:02X}'.format(0)).replace('yyyyyy', device)
+    stick.send(hex_to_write)
 
 @app.route('/')
 def index():
-    return "Hello, World!"
-
+    return "pyduofern-server"
 
 @app.route('/devices/<device>/up')
 def up(device):
+    setPair(device)
     stick.command(device, "up")
-
+    time.sleep(0.5)
+    stick.command(device, "up")
+    time.sleep(0.5)
+    stick.command(device, "up")
+    time.sleep(2)
+    return "OK\n"
 
 @app.route('/devices/<device>/down')
 def down(device):
+    setPair(device)
     stick.command(device, "down")
-
+    time.sleep(0.5)
+    stick.command(device, "down")
+    time.sleep(0.5)
+    stick.command(device, "down")
+    time.sleep(2)
+    return "OK\n"
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Web service for a duofern USB stick.')
@@ -31,8 +52,19 @@ if __name__ == '__main__':
     parser.add_argument('--device', help='the USB stick device', default=None)
     args = parser.parse_args(sys.argv[1:])
 
-    stick = DuofernStickThreaded(serial_port=args.device, system_code=args.code)
-    stick._initialize()
-    stick.start()
+    logging.basicConfig(level=logging.DEBUG if args.debug else logging.INFO)
 
-    app.run(debug=args.debug is True, host=args.listen, port=args.port)
+    config_file = tempfile.NamedTemporaryFile(delete=False)
+    config_file.write(b'{}')
+    config_file.close()
+
+    try:
+        stick = DuofernStickThreaded(serial_port=args.device, system_code=args.code, config_file_json=config_file.name)
+        stick._initialize()
+        stick.start()
+
+        app.run(debug=args.debug is True, host=args.listen, port=args.port)
+    except:
+        raise
+    finally:
+        os.unlink(config_file.name)
