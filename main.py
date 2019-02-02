@@ -76,6 +76,8 @@ if __name__ == '__main__':
     parser.add_argument('--listen', '-l', help='to address to listen on', default='127.0.0.1')
     parser.add_argument('--port', '-p', help='to port to listen on', default='8080')
     parser.add_argument('--device', help='the USB stick device', default=None)
+    parser.add_argument('--pair', help='start up for pairing and terminate after the pairing time', action='store_true')
+    parser.add_argument('--pair-time', help='time to wait for pairing requests in seconds', metavar="seconds", default=60, type=int)
     args = parser.parse_args(sys.argv[1:])
 
     logging.basicConfig(level=logging.DEBUG if args.debug else logging.INFO)
@@ -90,10 +92,14 @@ if __name__ == '__main__':
         stick.daemon = False
         stick.start()
 
-        app.run(debug=args.debug is True, host=args.listen, port=args.port)
+        if args.pair:
+            stick.pair(timeout=args.pair_time)
+            time.sleep(args.pairtime + 0.5)
+        else:
+            app.run(debug=args.debug is True, host=args.listen, port=args.port)
     except KeyboardInterrupt:
         pass
-    except Exception:
-        raise
+    except Exception as error:
+        print(error)
     finally:
         os.unlink(config_file.name)
