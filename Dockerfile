@@ -4,6 +4,6 @@ WORKDIR /pyduofern-server
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
-COPY . .
+COPY *.py .
 
 ENTRYPOINT ["python", "main.py"]
