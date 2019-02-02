@@ -2,18 +2,17 @@ import argparse
 import logging
 import os
 import sys
-
 import time
-
 import tempfile
-
 import flask
+import threading
+
 from pyduofern.duofern_stick import DuofernStickThreaded, duoACK, duoSetPairs
 from flask import Flask
-from pyduofern.exceptions import DuofernTimeoutException
 
 app = Flask(__name__)
 logger = logging.getLogger(__file__)
+lock = threading.Lock()
 
 def setPair(device):
     hex_to_write = duoSetPairs.replace('nn', '{:02X}'.format(0)).replace('yyyyyy', device)
@@ -29,13 +28,14 @@ def up(device):
         flask.abort(404)
         return
     try:
-        setPair(device)
-        stick.command(device, "up")
-        time.sleep(0.5)
-        stick.command(device, "up")
-        time.sleep(0.5)
-        stick.command(device, "up")
-        time.sleep(2)
+        with lock:
+            setPair(device)
+            stick.command(device, "up")
+            time.sleep(0.5)
+            stick.command(device, "up")
+            time.sleep(0.5)
+            stick.command(device, "up")
+            time.sleep(2)
         return "OK\n"
     except KeyError:
         flask.abort(404)
@@ -46,13 +46,14 @@ def down(device):
         flask.abort(404)
         return
     try:
-        setPair(device)
-        stick.command(device, "down")
-        time.sleep(0.5)
-        stick.command(device, "down")
-        time.sleep(0.5)
-        stick.command(device, "down")
-        time.sleep(2)
+        with lock:
+            setPair(device)
+            stick.command(device, "down")
+            time.sleep(0.5)
+            stick.command(device, "down")
+            time.sleep(0.5)
+            stick.command(device, "down")
+            time.sleep(2)
         return "OK\n"
     except KeyError:
         flask.abort(404)
