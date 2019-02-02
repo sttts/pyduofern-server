@@ -10,7 +10,7 @@ It is run within a docker container, e.g.:
 $ docker run -it --rm --name pyduofern-server --privileged -p 8080:8080 docker.io/sttts/pyduofern-server:latest --code <four-digit-code> --device /dev/ttyUSB0 -l 0.0.0.0
 ```
 
-The `<four-digit-code>` is a code used for pairing with devices, `/dev/ttyUSB0` is the device of the Rademacher USB-Stick 70000093 (works on Mac and Linux, e.g. on a Raspberry). Default port is `8080`.
+The `<four-digit-code>` (e.g. `1295`) is a code used for pairing with devices, `/dev/ttyUSB0` is the device of the Rademacher USB-Stick 70000093 (works on Mac and Linux, e.g. on a Raspberry). Default port is `8080`.
 
 The container is multi-arch ready, supporting arm32/64 and amd64.
 
