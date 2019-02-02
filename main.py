@@ -6,6 +6,8 @@ import sys
 import time
 
 import tempfile
+
+import flask
 from pyduofern.duofern_stick import DuofernStickThreaded, duoACK, duoSetPairs
 from flask import Flask
 from pyduofern.exceptions import DuofernTimeoutException
@@ -23,25 +25,37 @@ def index():
 
 @app.route('/devices/<device>/up')
 def up(device):
-    setPair(device)
-    stick.command(device, "up")
-    time.sleep(0.5)
-    stick.command(device, "up")
-    time.sleep(0.5)
-    stick.command(device, "up")
-    time.sleep(2)
-    return "OK\n"
+    if len(device) != 6:
+        flask.abort(404)
+        return
+    try:
+        setPair(device)
+        stick.command(device, "up")
+        time.sleep(0.5)
+        stick.command(device, "up")
+        time.sleep(0.5)
+        stick.command(device, "up")
+        time.sleep(2)
+        return "OK\n"
+    except KeyError:
+        flask.abort(404)
 
 @app.route('/devices/<device>/down')
 def down(device):
-    setPair(device)
-    stick.command(device, "down")
-    time.sleep(0.5)
-    stick.command(device, "down")
-    time.sleep(0.5)
-    stick.command(device, "down")
-    time.sleep(2)
-    return "OK\n"
+    if len(device) != 6:
+        flask.abort(404)
+        return
+    try:
+        setPair(device)
+        stick.command(device, "down")
+        time.sleep(0.5)
+        stick.command(device, "down")
+        time.sleep(0.5)
+        stick.command(device, "down")
+        time.sleep(2)
+        return "OK\n"
+    except KeyError:
+        flask.abort(404)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Web service for a duofern USB stick.')
@@ -61,10 +75,13 @@ if __name__ == '__main__':
     try:
         stick = DuofernStickThreaded(serial_port=args.device, system_code=args.code, config_file_json=config_file.name)
         stick._initialize()
+        stick.daemon = False
         stick.start()
 
         app.run(debug=args.debug is True, host=args.listen, port=args.port)
-    except:
+    except KeyboardInterrupt:
+        pass
+    except Exception:
         raise
     finally:
         os.unlink(config_file.name)
