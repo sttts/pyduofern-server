@@ -14,13 +14,22 @@ app = Flask(__name__)
 logger = logging.getLogger(__file__)
 lock = threading.Lock()
 
+
 def setPair(device):
     hex_to_write = duoSetPairs.replace('nn', '{:02X}'.format(0)).replace('yyyyyy', device)
     stick.send(hex_to_write)
 
+
+def sendAndWait(device, cmd):
+    stick.command(device, cmd)
+    while len(stick.write_queue) > 0:
+        time.sleep(0.1)
+
+
 @app.route('/')
 def index():
     return "pyduofern-server"
+
 
 @app.route('/devices/<device>/up')
 def up(device):
@@ -30,15 +39,16 @@ def up(device):
     try:
         with lock:
             setPair(device)
-            stick.command(device, "up")
+            sendAndWait(device, "up")
             time.sleep(0.5)
-            stick.command(device, "up")
+            sendAndWait(device, "up")
             time.sleep(0.5)
-            stick.command(device, "up")
+            sendAndWait(device, "up")
             time.sleep(2)
         return "OK\n"
     except KeyError:
         flask.abort(404)
+
 
 @app.route('/devices/<device>/down')
 def down(device):
@@ -48,15 +58,16 @@ def down(device):
     try:
         with lock:
             setPair(device)
-            stick.command(device, "down")
+            sendAndWait(device, "down")
             time.sleep(0.5)
-            stick.command(device, "down")
+            sendAndWait(device, "down")
             time.sleep(0.5)
-            stick.command(device, "down")
+            sendAndWait(device, "down")
             time.sleep(2)
         return "OK\n"
     except KeyError:
         flask.abort(404)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Web service for a duofern USB stick.')
