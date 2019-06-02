@@ -20,8 +20,8 @@ def setPair(device):
     stick.send(hex_to_write)
 
 
-def sendAndWait(device, cmd):
-    stick.command(device, cmd)
+def sendAndWait(device, cmd, *args):
+    stick.command(device, cmd, *args)
     while len(stick.write_queue) > 0:
         time.sleep(0.1)
 
@@ -68,6 +68,24 @@ def down(device):
     except KeyError:
         flask.abort(404)
 
+
+@app.route('/devices/<device>/position/<int:pos>')
+def position(device, pos):
+    if len(device) != 6:
+        flask.abort(404)
+        return
+    try:
+        with lock:
+            setPair(device)
+            sendAndWait(device, "position", pos)
+            time.sleep(0.5)
+            sendAndWait(device, "position", pos)
+            time.sleep(0.5)
+            sendAndWait(device, "position", pos)
+            time.sleep(2)
+        return "OK\n"
+    except KeyError:
+        flask.abort(404)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Web service for a duofern USB stick.')
