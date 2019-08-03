@@ -6,6 +6,7 @@ import time
 import tempfile
 import flask
 import threading
+from flask import request
 
 from pyduofern.duofern_stick import DuofernStickThreaded, duoACK, duoSetPairs
 from flask import Flask
@@ -68,9 +69,22 @@ def down(device):
     except KeyError:
         flask.abort(404)
 
+@app.route('/devices/<device>/position', methods = ['GET', 'POST'])
+def getPosition(device):
+    if len(device) != 6:
+        flask.abort(404)
+        return
+    if request.method == 'GET':
+        try:
+            state = stick.duofern_parser.modules['by_code'][device]
+            return str(state["position"]) if "position" in state else ""
+        except KeyError:
+            flask.abort(404)
+    elif request.method == 'POST':
+        return setPosition(device, request.form.get('value'))
 
 @app.route('/devices/<device>/position/<int:pos>')
-def position(device, pos):
+def setPosition(device, pos):
     if len(device) != 6:
         flask.abort(404)
         return
