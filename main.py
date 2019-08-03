@@ -31,44 +31,6 @@ def sendAndWait(device, cmd, *args):
 def index():
     return "pyduofern-server"
 
-
-@app.route('/devices/<device>/up')
-def up(device):
-    if len(device) != 6:
-        flask.abort(404)
-        return
-    try:
-        with lock:
-            setPair(device)
-            sendAndWait(device, "up")
-            time.sleep(0.5)
-            sendAndWait(device, "up")
-            time.sleep(0.5)
-            sendAndWait(device, "up")
-            time.sleep(2)
-        return "OK\n"
-    except KeyError:
-        flask.abort(404)
-
-
-@app.route('/devices/<device>/down')
-def down(device):
-    if len(device) != 6:
-        flask.abort(404)
-        return
-    try:
-        with lock:
-            setPair(device)
-            sendAndWait(device, "down")
-            time.sleep(0.5)
-            sendAndWait(device, "down")
-            time.sleep(0.5)
-            sendAndWait(device, "down")
-            time.sleep(2)
-        return "OK\n"
-    except KeyError:
-        flask.abort(404)
-
 @app.route('/devices/<device>/position', methods = ['GET', 'POST'])
 def getPosition(device):
     if len(device) != 6:
@@ -82,6 +44,35 @@ def getPosition(device):
             flask.abort(404)
     elif request.method == 'POST':
         return setPosition(device, request.form.get('value'))
+
+@app.route('/devices/<device>/position/stop')
+def stop(device):
+    return runCommand(device, "stop")
+
+@app.route('/devices/<device>/position/up')
+def up(device):
+    return runCommand(device, "up")
+
+@app.route('/devices/<device>/position/down')
+def down(device):
+    return runCommand(device, "down")
+
+def runCommand(device, cmd):
+    if len(device) != 6:
+        flask.abort(404)
+        return
+    try:
+        with lock:
+            setPair(device)
+            sendAndWait(device, cmd)
+            time.sleep(0.5)
+            sendAndWait(device, cmd)
+            time.sleep(0.5)
+            sendAndWait(device, cmd)
+            time.sleep(2)
+        return "OK\n"
+    except KeyError:
+        flask.abort(404)
 
 @app.route('/devices/<device>/position/<int:pos>')
 def setPosition(device, pos):
