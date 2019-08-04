@@ -1,0 +1,29 @@
+rule "KleinesZimmerRolladen"
+when
+    Item KleinesZimmerRolladen received command
+then
+    val x = 3
+    switch(receivedCommand.toString.toUpperCase) {
+        case "UP": {
+           sendHttpGetRequest("http://pyduofern-server:8080/devices/4001e7/position/up")
+        }
+        case "STOP": {
+           sendHttpGetRequest("http://pyduofern-server:8080/devices/4001e7/position/stop")
+        }
+        case "DOWN": {
+           sendHttpGetRequest("http://pyduofern-server:8080/devices/4001e7/position/down")
+        }
+        default: {
+            if (receivedCommand.state instanceof PercentType) {
+                sendHttpGetRequest("http://pyduofern-server:8080/devices/4001e7/position/" + receivedCommand.state.toString)
+            }
+        }
+    }
+end
+
+rule "KleinesZimmerRolladen_Value"
+when
+    Item KleinesZimmerRolladen_Value changed
+then
+    KleinesZimmerRolladen.postUpdate(new PercentType((KleinesZimmerRolladen_Value.state as Number).intValue))
+end

@@ -1,0 +1,3 @@
+sitemap default label="Duofern Example" {
+  Default item=KleinesZimmerRolladen label="kleines Zimmer"
+}

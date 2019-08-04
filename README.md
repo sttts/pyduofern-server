@@ -1,8 +1,15 @@
 # pyduofern-server
 
-Based on https://github.com/gluap/pyduofern this project provides a webhook server to be called from smart home system like https://hom.ee/ to move up and down blinds.
+Based on https://github.com/gluap/pyduofern this project provides a webhook server to be called from smart home systems like 
+
+* https://hom.ee/
+* [OpenHAB](https://community.openhab.org/t/rademacher-duofern-without-fhem-but-pyduofern-server/79250)
+ 
+to move up and down blinds.
 
 ![Calling the webhooks in Homee](https://raw.githubusercontent.com/sttts/pyduofern-server/master/homee.png)
+
+![Calling the webhooks in OpenHAB](https://raw.githubusercontent.com/sttts/pyduofern-server/master/openhab.png)
 
 It is run within a docker container, e.g.:
 

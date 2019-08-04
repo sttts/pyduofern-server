@@ -1,0 +1,2 @@
+Number KleinesZimmerRolladen_Value "Kleines Zimmer Rolladen [%.0f %%]" <Blinds>  { http="<[http://pyduofern-server:8080/devices/400209/position:5000:JS(parseInt.js)]" }
+Rollershutter KleinesZimmerRolladen "Kleines Zimmer Rolladen [%.0f %%]"
